@@ -19,7 +19,7 @@ arbitrary = ["dep:arbitrary"]
 serde = ["dep:serde"]
 
 [dependencies]
-prost = { version = "0.13.5", path = "../prost", default-features = false, features = ["prost-derive"] }
+prost = { version = "0.13.5-serde2", path = "../prost", default-features = false, features = ["prost-derive"] }
 arbitrary = { version = "1.4", features = ["derive"], optional = true }
 serde = { version = "1.0.219", default-features = false, optional = true }
 
