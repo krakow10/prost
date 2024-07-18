@@ -21,6 +21,7 @@ arbitrary = ["dep:arbitrary"]
 prost = { version = "0.13.5", path = "../prost", default-features = false, features = ["prost-derive"] }
 arbitrary = { version = "1.4", features = ["derive"], optional = true }
 serde = { version = "1.0.204", features = ["derive"] }
+serde_json = "1.0.120"
 
 [dev-dependencies]
 proptest = "1"
