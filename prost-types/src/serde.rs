@@ -72,7 +72,7 @@ impl<'de> Deserialize<'de> for Value {
         D: Deserializer<'de>,
     {
         Self {
-            kind: Some(deserializer.deserialize_any(KindVisitor)?),
+            kind: deserializer.deserialize_any(KindVisitor)?,
         }
     }
 }
@@ -80,7 +80,7 @@ impl<'de> Deserialize<'de> for Value {
 struct KindVisitor;
 
 impl<'de> Visitor<'de> for KindVisitor {
-    type Value = Kind;
+    type Value = Option<Kind>;
 
     fn expecting(&self, formatter: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         formatter.write_str("any valid protobuf value")
@@ -88,26 +88,26 @@ impl<'de> Visitor<'de> for KindVisitor {
 
     #[inline]
     fn visit_bool<E>(self, value: bool) -> Result<Self::Value, E> {
-        Ok(Kind::BoolValue(value))
+        Ok(Some(Kind::BoolValue(value)))
     }
 
     #[inline]
     fn visit_i64<E: Error>(self, value: i64) -> Result<Self::Value, E> {
         let rounded = value as f64;
         match rounded as i64 == value {
-            true => Ok(Kind::NumberValue(value as f64)),
+            true => Ok(Some(Kind::NumberValue(value as f64))),
             false => Err(Error::custom("i64 cannot be represented by f64")),
         }
     }
 
     #[inline]
     fn visit_u64<E>(self, value: u64) -> Result<Self::Value, E> {
-        Ok(Kind::NumberValue(value as f64))
+        Ok(Some(Kind::NumberValue(value as f64)))
     }
 
     #[inline]
     fn visit_f64<E>(self, value: f64) -> Result<Self::Value, E> {
-        Ok(Kind::NumberValue(value))
+        Ok(Some(Kind::NumberValue(value)))
     }
 
     #[inline]
@@ -120,12 +120,12 @@ impl<'de> Visitor<'de> for KindVisitor {
 
     #[inline]
     fn visit_string<E>(self, value: ::prost::alloc::string::String) -> Result<Self::Value, E> {
-        Ok(Kind::StringValue(value))
+        Ok(Some(Kind::StringValue(value)))
     }
 
     #[inline]
     fn visit_none<E>(self) -> Result<Self::Value, E> {
-        Ok(Kind::NullValue(0))
+        Ok(Some(Kind::NullValue(0)))
     }
 
     #[inline]
@@ -138,7 +138,7 @@ impl<'de> Visitor<'de> for KindVisitor {
 
     #[inline]
     fn visit_unit<E>(self) -> Result<Self::Value, E> {
-        Ok(Kind::NullValue(0))
+        Ok(Some(Kind::NullValue(0)))
     }
 
     #[inline]
@@ -152,7 +152,7 @@ impl<'de> Visitor<'de> for KindVisitor {
             values.push(elem);
         }
 
-        Ok(Kind::ListValue(ListValue { values }))
+        Ok(Some(Kind::ListValue(ListValue { values })))
     }
 
     fn visit_map<V>(self, mut visitor: V) -> Result<Self::Value, V::Error>
@@ -165,7 +165,11 @@ impl<'de> Visitor<'de> for KindVisitor {
             fields.insert(key, value);
         }
 
-        Ok(Kind::StructValue(Struct { fields }))
+        if fields.is_empty() {
+            return Ok(None);
+        }
+
+        Ok(Some(Kind::StructValue(Struct { fields })))
     }
 }
 
