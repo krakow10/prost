@@ -47,7 +47,7 @@ pub mod compiler;
 mod datetime;
 #[rustfmt::skip]
 mod protobuf;
-#[cfg(feature = "serde")]
+#[cfg(all(feature = "serde", feature = "std"))]
 mod serde;
 
 use core::convert::TryFrom;
