@@ -58,7 +58,11 @@ impl Serialize for Value {
             Some(Kind::BoolValue(v)) => serializer.serialize_bool(*v),
             Some(Kind::StructValue(v)) => v.serialize(serializer),
             Some(Kind::ListValue(v)) => v.serialize(serializer),
-            None => serializer.serialize_none(),
+            None => {
+                // Serialize an empty object.
+                let mut s = serializer.serialize_map(Some(0))?;
+                s.end()
+            }
         }
     }
 }
