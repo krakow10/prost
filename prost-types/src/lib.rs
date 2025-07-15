@@ -36,6 +36,7 @@
 //! ## Feature Flags
 //! - `std`: Enable integration with standard library. Disable this feature for `no_std` support. This feature is enabled by default.
 //! - `arbitrary`: Enable integration with crate `arbitrary`. All types on this crate will implement `trait Arbitrary`.
+//! - `serde`: Enable integration with crate `serde`. The ListValue, Struct, and Value types will implement `serde::Serialize` and `serde::Deserialize`.
 //!
 //! [1]: https://developers.google.com/protocol-buffers/docs/reference/google.protobuf
 
